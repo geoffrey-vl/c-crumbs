@@ -18,7 +18,7 @@ void print_buffer(const unsigned char a[], int length)
 {
   int i;
   for (i=0; i<length; i++) {
-    printf("0x%X ", a[i]);
+    printf("0x%02X ", a[i]);
   };
 }
 

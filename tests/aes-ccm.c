@@ -12,6 +12,35 @@
 #include <stdio.h>
 #include <string.h>
 
+
+void print_buffer(const unsigned char a[], int length)
+{
+  int i;
+  for (i=0; i<length; i++) {
+    printf("0x%02X ", a[i]);
+  };
+}
+
+void print_result(const char* test, const unsigned char x[], int x_length, const unsigned char ciphertext[], int mac_length, 
+                  const unsigned char nonce[], int nonce_length, const unsigned char ad[], int ad_length, 
+                  const unsigned char payload[], int payload_length, const unsigned char key[])
+{
+  printf("---------%s---------\n", test);
+  printf("  payload: [ ");
+  print_buffer(payload, payload_length);
+  printf("]\n  converted ciphertext: [ ");
+  print_buffer(x, x_length);
+  printf("]\n  key: [ ");
+  print_buffer(key, 16);
+  printf("]\n  nonce: [ ");
+  print_buffer(nonce, nonce_length);
+  printf("]\n  associated data: [ ");
+  print_buffer(ad, ad_length);
+  printf("]\n  expected ciphertext: [ ");
+  print_buffer(ciphertext, mac_length);
+  printf("]\n");
+}
+
 /*
  * Tests the aes_ccm_encrypt/decrypt functions with the values in:
  *
@@ -46,6 +75,7 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.1 Example 1", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 1\n", stderr);
       return 1;
@@ -86,6 +116,7 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 6, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.2 Example 2", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 2\n", stderr);
       return 1;
@@ -130,6 +161,7 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.3 Example 3", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 3\n", stderr);
       return 1;
@@ -177,6 +209,7 @@ int main(int argc, char **argv) {
       ad[i] = i;
     }
     aes_ccm_encrypt(x, 14, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    //print_result("[CCM] C.4", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 4\n", stderr);
       return 1;
@@ -219,6 +252,7 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.3", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed ZigBee example\n", stderr);
       return 1;

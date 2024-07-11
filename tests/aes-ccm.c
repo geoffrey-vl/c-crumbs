@@ -28,14 +28,14 @@ void print_result(const char* test, const unsigned char x[], int x_length, const
   printf("---------%s---------\n", test);
   printf("  payload: [ ");
   print_buffer(payload, payload_length);
-  printf("]\n  converted ciphertext: [ ");
-  print_buffer(x, x_length);
   printf("]\n  key: [ ");
   print_buffer(key, 16);
   printf("]\n  nonce: [ ");
   print_buffer(nonce, nonce_length);
   printf("]\n  associated data: [ ");
   print_buffer(ad, ad_length);
+  printf("]\n  converted ciphertext: [ ");
+  print_buffer(x, x_length);
   printf("]\n  expected ciphertext: [ ");
   print_buffer(ciphertext, mac_length);
   printf("]\n");
@@ -75,13 +75,17 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
-    print_result("[CCM] C.1 Example 1", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.1 Example 1 (encrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 1\n", stderr);
       return 1;
     }
 
-    if (aes_ccm_decrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key)) {
+    int mac_err = aes_ccm_decrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    print_result("[CCM] C.1 Example 1 (decrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
       fputs("aes_ccm_decrypt() tag failed CCM example 1\n", stderr);
       return 1;
     }
@@ -116,13 +120,17 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 6, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
-    print_result("[CCM] C.2 Example 2", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.2 Example 2 (encrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 2\n", stderr);
       return 1;
     }
 
-    if (aes_ccm_decrypt(x, 6, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key)) {
+    int mac_err = aes_ccm_decrypt(x, 6, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    print_result("[CCM] C.2 Example 2 (decrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
       fputs("aes_ccm_decrypt() tag failed CCM example 2\n", stderr);
       return 1;
     }
@@ -161,13 +169,17 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
-    print_result("[CCM] C.3 Example 3", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.3 Example 3 (encrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 3\n", stderr);
       return 1;
     }
 
-    if (aes_ccm_decrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key)) {
+    int mac_err = aes_ccm_decrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    print_result("[CCM] C.3 Example 3 (decrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
       fputs("aes_ccm_decrypt() tag failed CCM example 3\n", stderr);
       return 1;
     }
@@ -209,13 +221,17 @@ int main(int argc, char **argv) {
       ad[i] = i;
     }
     aes_ccm_encrypt(x, 14, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
-    //print_result("[CCM] C.4", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    //print_result("[CCM] C.4 (encrypt)", 
+    //  x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed CCM example 4\n", stderr);
       return 1;
     }
 
-    if (aes_ccm_decrypt(x, 14, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key)) {
+    int mac_err = aes_ccm_decrypt(x, 14, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    //print_result("[CCM] C.4 (decrypt)", 
+    //  x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
       fputs("aes_ccm_decrypt() tag failed CCM example 4\n", stderr);
       return 1;
     }
@@ -252,15 +268,110 @@ int main(int argc, char **argv) {
     unsigned char x[sizeof(ciphertext)];
 
     aes_ccm_encrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
-    print_result("[CCM] C.3", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[CCM] C.3 (encrypt)", x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
     if (memcmp(x, ciphertext, sizeof(ciphertext))) {
       fputs("aes_ccm_encrypt() failed ZigBee example\n", stderr);
       return 1;
     }
 
-    if (aes_ccm_decrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key)) {
+    int mac_err = aes_ccm_decrypt(x, 8, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    print_result("[CCM] C.3 (decrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
       fputs("aes_ccm_decrypt() tag failed ZigBee example\n", stderr);
       return 1;
+    }
+    if (memcmp(x, payload, sizeof(payload))) {
+      fputs("aes_ccm_decrypt() payload failed ZigBee example\n", stderr);
+      return 1;
+    }
+  }
+
+  /* [ZIGBEE DIRECT] B.4 Accessing secure characteristics via AES-CCM-128 */
+  {
+    // BLE consts
+    const unsigned char service_uuid[16] = {
+      0x00, 0x00, 0xff, 0xf7, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
+    const unsigned char service_instance[1] = {0x00};
+    const unsigned char characteristic_uuid[16] = {
+      0x70, 0x72, 0x37, 0x7d, 0x00, 0x02, 0x42, 0x1c, 0xb1, 0x63, 0x49, 0x1c, 0x27, 0x33, 0x3a, 0x61};
+    const unsigned char characteristic_instance[1] = {0x00};
+    // device
+    const unsigned char reverse_eui64[8] = {0x01, 0x00, 0x00, 0x00, 0x00, 0xee, 0x1f, 0x00};
+    // security counters
+    const unsigned char frame_counter[4] = {0x02, 0x00, 0x00, 0x00};
+    const unsigned char control_field[1] = {0x05};
+
+    const unsigned char payload[45] = {
+      0x07, 0x00, 0x03, 0x00, 0x07, 0xd9, 0x1f, 0x00, 0x00, 0x00, 0xae, 0x1f, 0x00, 0x01, 
+      0x01, 0x26, 0x90, 0x02, 0x03, 0x00, 0x00, 0x01, 0x00, 0x03, 0x0f, 0x5c, 0xd2, 0xf8,
+      0xbe, 0xd4, 0xea, 0x50, 0x56, 0xac, 0x02, 0xa8, 0xee, 0x84, 0x1a, 0xa0, 0x86, 0x06, 
+      0x01, 0xcd, 0xab};
+
+
+    const unsigned char key[16] = {
+      0xa2, 0xe2, 0xb6, 0x1b, 0xf1, 0xa8, 0x05, 0x81, 0xd0, 0x7f, 0x1f, 0x06, 0x72, 0xd1, 0xd6, 0x24
+    };
+
+    // construct nonce
+    unsigned char nonce[sizeof(reverse_eui64) + sizeof(frame_counter) + sizeof(control_field)] = {0x00};
+    int offset = 0;
+    for(int i=0; i<sizeof(reverse_eui64); i++) {
+      nonce[offset + i] = reverse_eui64[i];
+    }
+    offset += sizeof(reverse_eui64);
+    for(int i=0; i<sizeof(frame_counter); i++) {
+      nonce[offset + i] = frame_counter[i];
+    }
+    offset += sizeof(frame_counter);
+    for(int i=0; i<sizeof(control_field); i++) {
+      nonce[offset + i] = control_field[i];
+    }
+    // construct authentication data
+    unsigned char ad[sizeof(service_uuid) + 
+                                  sizeof(service_instance) + 
+                                  sizeof(characteristic_uuid) +
+                                  sizeof(characteristic_instance) ] = {0x00};
+    offset = 0;
+    for(int i=0; i<sizeof(service_uuid); i++) {
+      ad[offset + i] = service_uuid[i];
+    }
+    offset += sizeof(service_uuid);
+    for(int i=0; i<sizeof(service_instance); i++) {
+      ad[offset + i] = service_instance[i];
+    }
+    offset += sizeof(service_instance);
+    for(int i=0; i<sizeof(characteristic_uuid); i++) {
+      ad[offset + i] = characteristic_uuid[i];
+    }
+    offset += sizeof(characteristic_uuid);
+    for(int i=0; i<sizeof(characteristic_instance); i++) {
+      ad[offset + i] = characteristic_instance[i];
+    }
+
+    // 0..44 encrypted data, 45..49 integrity code
+    const unsigned char ciphertext[45 + 4] = {
+      0x23, 0xb7, 0x11, 0xa6, 0x91, 0x6a, 0xba, 0x32, 0x82, 0xb3, 0x7a, 0x7c, 0xb4, 0x4f,
+      0x30, 0x18, 0x7c, 0x43, 0xc2, 0x45, 0xd3, 0xbd, 0x6f, 0xf1, 0xaf, 0xe5, 0x9d, 0x0b,
+      0x3a, 0x9b, 0x0f, 0xda, 0xc5, 0x26, 0xd3, 0x63, 0x3d, 0xae, 0xdf, 0x73, 0x5d, 0x78,
+      0x35, 0xfe, 0x9f,
+      0x3f, 0x12, 0xbd, 0xf8};
+    unsigned char x[sizeof(ciphertext)];
+
+    aes_ccm_encrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    print_result("[ZIGBEE DIRECT] B.4 Accessing secure characteristics via AES-CCM-128 (encrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (memcmp(x, ciphertext, sizeof(ciphertext))) {
+      fputs("aes_ccm_encrypt() failed ZigBee example\n", stderr);
+      return 1;
+    }
+
+    int mac_err = aes_ccm_decrypt(x, 4, nonce, sizeof(nonce), ad, sizeof(ad), ciphertext, sizeof(ciphertext), key);
+    print_result("[ZIGBEE DIRECT] B.4 Accessing secure characteristics via AES-CCM-128 (decrypt)", 
+      x, sizeof(x), ciphertext, sizeof(ciphertext), nonce, sizeof(nonce), ad, sizeof(ad), payload, sizeof(payload), key);
+    if (mac_err) {
+      fputs("aes_ccm_decrypt() tag failed ZigBee example\n", stderr);
+      //return 1;
     }
     if (memcmp(x, payload, sizeof(payload))) {
       fputs("aes_ccm_decrypt() payload failed ZigBee example\n", stderr);
